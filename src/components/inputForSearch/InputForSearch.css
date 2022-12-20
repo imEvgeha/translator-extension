@@ -1,0 +1,31 @@
+.search_icon {
+    color: var(--white) !important;
+    z-index: 1;
+}
+
+.search_bar_input {
+    border: 1px solid var(--white-gray);
+    border-radius: 39px;
+    background-color: var(--white-gray);
+    color: var(--white);
+}
+.search_bar_input::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: var(--white);
+    opacity: 1; /* Firefox */
+}
+.search_bar_input:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: var(--white);
+}
+.search_bar_input::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: var(--white);
+}
+.search_bar_input:enabled:focus {
+    border: 1px solid #ced4da;
+    box-shadow: none;
+}
+.search_bar_input:enabled:hover {
+    border-color: var(--white-gray);
+}

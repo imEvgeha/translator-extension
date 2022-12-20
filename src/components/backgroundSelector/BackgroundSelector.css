@@ -1,0 +1,4 @@
+.background_wrapper {
+    background-color: var(--light-gray);
+    padding: 0.5rem 2rem;
+}

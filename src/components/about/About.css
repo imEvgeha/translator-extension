@@ -1,0 +1,9 @@
+.about-wrapper {
+    padding: 0px 250px;
+}
+
+.about-link {
+    background: rgba(83, 83, 83, 0.44);
+    border-radius: 40px;
+    padding: 10px 15px;
+}

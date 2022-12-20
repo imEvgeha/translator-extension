@@ -1,25 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import { Button } from "primereact/button";
+import "./App.css";
+import "primereact/resources/themes/lara-light-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+import SettingsTabs from "./components/settingsTabs/SettingsTabs";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    return (
+        <div className="App">
+            <Button
+                onClick={() => {
+                    // eslint-disable-next-line no-undef
+                    chrome.runtime.sendMessage({ messageType: "ClosePopup" });
+                }}
+                className="p-button-close text-white surface-800 p-button-link shadow-none"
+                icon="pi pi-times"
+            />
 
+            <SettingsTabs />
+        </div>
+    );
+}
 export default App;

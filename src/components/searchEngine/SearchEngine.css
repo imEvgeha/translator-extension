@@ -1,0 +1,30 @@
+.search-engine-title {
+    font-size: 13px;
+}
+
+.search-engine-wrapper {
+    background-color: var(--light-gray);
+    min-height: 54px;
+}
+
+.p-dropdown,
+.p-dropdown:not(.p-disabled).p-focus {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+.p-dropdown .p-dropdown-label,
+.p-dropdown .p-dropdown-label.p-placeholde,
+.p-dropdown .p-dropdown-trigger,
+.p-dropdown .p-dropdown-label.p-placeholder {
+    color: var(--white);
+}
+
+.p-dropdown .p-dropdown-label {
+    display: none;
+}
+
+.p-dropdown-trigger-icon {
+    font-size: 13px;
+}

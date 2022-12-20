@@ -1,0 +1,18 @@
+.bookmarks-header {
+    font-size: 13px;
+}
+
+.bookmarks-wrapper {
+    background-color: var(--light-gray);
+    font-weight: 500;
+    color: var(--white);
+}
+
+.p-button-add-bookmarks {
+    z-index: 1000;
+}
+.p-button-add-bookmarks.p-button.p-button-icon-only {
+    height: 13px;
+    width: 13px;
+    padding: 0.5rem 0 !important;
+}
