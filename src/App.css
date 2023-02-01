@@ -1,18 +1,2 @@
 @import "primeflex/primeflex.css";
 @import "primeflex/themes/saga-blue.css";
-
-.p-button-close {
-    position: absolute !important;
-    z-index: 1000;
-    right: 2.4rem;
-    top: 32px;
-}
-.p-button-close.p-button.p-button-icon-only {
-    width: 2.7rem;
-    padding: 0.5rem 0 !important;
-}
-
-.p-tabview-panels {
-    background: none !important;
-    padding: 1rem 1.25rem !important;
-}

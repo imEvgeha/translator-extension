@@ -1,43 +1,27 @@
 .main-container {
-    margin: 1rem;
-    height: 500px;
+    border-radius: 16.72px;
+    padding: 1rem;
+    width: 400px;
     overflow: auto;
 }
 
-.logo-wrapper {
-    background-color: var(--matte-transparent);
-    border-radius: 10px;
-    padding: 1.5rem 7rem;
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: rgba(248, 105, 145, 0.6);
 }
 
-.text-gradient {
-    background: -webkit-linear-gradient(
-        90deg,
-        #8919ce 0%,
-        #861ccf 2.08%,
-        #ff00d6 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.p-inputswitch.p-inputswitch-checked:not(.p-disabled):hover
+    .p-inputswitch-slider {
+    background: rgba(197, 80, 113, 0.6);
 }
 
-.button-gradient,
-.button-gradient:focus,
-.button-gradient:hover,
-.button-gradient:enabled:active {
-    min-width: 118px;
-    border: none !important;
-    box-shadow: none !important;
-    background: -webkit-linear-gradient(
-        90deg,
-        #8919ce 0%,
-        #861ccf 2.08%,
-        #ff00d6 100%
-    ) !important;
+.p-inputswitch.p-focus .p-inputswitch-slider {
+    box-shadow: none;
 }
 
-.wrapper {
-    background-color: var(--matte-transparent);
-    border-radius: 10px;
-    padding: 1.5rem 2.5rem;
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+    background: linear-gradient(219.64deg, #f480b2 27.32%, #ff4057 100%);
+}
+
+.custom-pink-bg {
+    background: #ff6c93;
 }

@@ -1,0 +1,10 @@
+.download-button {
+    position: absolute;
+    top: 0px;
+    z-index: 1000;
+    padding-top: 10px;
+    padding-left: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}

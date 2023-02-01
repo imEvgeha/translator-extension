@@ -1,28 +1,25 @@
 /* eslint-disable no-undef */
 (() => {
-    let lastVideoArray = [];
     setInterval(async () => {
-        let isVideoDisplayed = false;
-        await chrome?.storage?.local
-            ?.get(["isVideoDisplayed"])
-            ?.then((result) => {
-                isVideoDisplayed = result?.isVideoDisplayed?.result;
+        var accessToDisplayDownloadBtn;
+        await chrome.storage.local
+            .get(["isDisplayDownloadButtonsAllowed"])
+            .then((result) => {
+                accessToDisplayDownloadBtn =
+                    result?.isDisplayDownloadButtonsAllowed?.access;
             });
 
-        const updatePopupData = (videoDataArray, updatedVideoDataArray) => {
-            if (
-                !isVideoDisplayed ||
-                !isVideoIdInArraysEqual(videoDataArray, lastVideoArray)
-            ) {
-                chrome?.runtime?.sendMessage({
-                    messageType: "UpdatePopupData",
-                    data: updatedVideoDataArray?.length
-                        ? updatedVideoDataArray
-                        : videoDataArray,
-                });
-                lastVideoArray = videoDataArray;
-            }
-        };
+        if (!accessToDisplayDownloadBtn) {
+            const downloadButtons =
+                document.querySelectorAll(".download-button");
+            const buttonsArray = downloadButtons.length
+                ? [...downloadButtons]
+                : [];
+            buttonsArray.forEach((item) => {
+                item.remove();
+            });
+            return;
+        }
 
         if (window.location.host === "www.facebook.com") {
             // Logic for Facebook
@@ -57,11 +54,13 @@
                         extractShortRefFromArray(videoRefSplitted);
 
                     if (isVideoIdValid(videoShortRef)) {
-                        return {
+                        const videoData = {
                             videoName: cutLongName(postTitle),
                             videoRef: videoShortRef,
                             videoFrom: WEBSITE.FACEBOOK,
                         };
+                        createDownloadButton(item, WEBSITE.FACEBOOK, videoData);
+                        return videoData;
                     }
                 } else if (
                     window.location.href?.includes(VIDEO_REF_PART_VIDEOS)
@@ -89,11 +88,13 @@
                         extractShortRefFromArray(videoRefSplitted);
 
                     if (isVideoIdValid(videoShortRef)) {
-                        return {
+                        const videoData = {
                             videoName: cutLongName(postTitle),
                             videoRef: videoShortRef,
                             videoFrom: WEBSITE.FACEBOOK,
                         };
+                        createDownloadButton(item, WEBSITE.FACEBOOK, videoData);
+                        return videoData;
                     }
                 } else if (
                     !window.location.href?.includes(VIDEO_REF_PART_WATCH) ||
@@ -128,11 +129,13 @@
                         extractShortRefFromArray(videoRefSplitted);
 
                     if (isVideoIdValid(videoShortRef)) {
-                        return {
+                        const videoData = {
                             videoName: cutLongName(postTitle),
                             videoRef: videoShortRef,
                             videoFrom: WEBSITE.FACEBOOK,
                         };
+                        createDownloadButton(item, WEBSITE.FACEBOOK, videoData);
+                        return videoData;
                     }
                 }
                 return {
@@ -141,9 +144,6 @@
                     videoFrom: WEBSITE.FACEBOOK,
                 };
             });
-
-            updatePopupData(videoDataArray);
-
             // extract video from URL
             const splittedHref = window.location.href.split("/");
             const shortRefFromPageURL = extractShortRefFromArray(splittedHref);
@@ -164,7 +164,7 @@
             // logic for Twitter
             const videoTags = document.querySelectorAll("video");
             const videosArray = videoTags.length ? [...videoTags] : [];
-            const videoDataArray = videosArray.map((item) => {
+            videosArray.forEach((item) => {
                 const mainItemParent = getThirteenthParentOfItem(
                     getFifthParentOfItem(item)
                 );
@@ -177,18 +177,20 @@
                     'div[dir="auto"][data-testid="tweetText"][lang]'
                 );
                 const videoNameArray = [...videoNameWrapper?.children].map(
-                    (item) => item.innerText
+                    (item) => item?.innerText
                 );
                 const postTitle = videoNameArray.length
                     ? videoNameArray.join(" ")
                     : UNNAMED_VIDEO;
 
                 if (shortRef) {
-                    return {
+                    const videoData = {
                         videoName: cutLongName(postTitle),
                         videoRef: shortRef,
                         videoFrom: WEBSITE.TWITTER,
                     };
+                    createDownloadButton(item, WEBSITE.TWITTER, videoData);
+                    return videoData;
                 }
 
                 return {
@@ -197,17 +199,15 @@
                     videoFrom: WEBSITE.TWITTER,
                 };
             });
-
-            updatePopupData(videoDataArray);
         } else if (window.location.host === "www.instagram.com") {
             // logic for Instagram
             const articles = [...document.querySelectorAll("article")];
-            const videoDataArray = articles?.map((article) => {
+            articles?.forEach((article) => {
                 const videosList = [...article?.querySelectorAll("video")];
                 const profileWhoPosted = article.querySelector(
                     'div > div > span > a[href][role="link"][tabindex="0"]'
                 );
-                const profileName = profileWhoPosted.innerText;
+                const profileName = profileWhoPosted?.innerText;
 
                 const videoData = videosList?.map((item) => {
                     if (item?.src?.includes("www.instagram.com")) {
@@ -224,32 +224,37 @@
                         const downloadVideoURL =
                             videoShortRef &&
                             `${URL_FOR_INSTAGRAM_VIDEO_DOWNLOADING}%22${videoShortRef}%22}`;
-                        return {
+                        const videoData = {
                             videoName: cutLongName(profileName),
                             videoRef: downloadVideoURL,
                             isVideoReadyToDownloading: false,
                             videoFrom: WEBSITE.INSTAGRAM,
                         };
+                        createDownloadButton(
+                            item,
+                            WEBSITE.INSTAGRAM,
+                            videoData
+                        );
+                        return videoData;
                     } else {
-                        return {
+                        const videoData = {
                             videoName: cutLongName(profileName),
                             videoRef: item.src,
                             isVideoReadyToDownloading: true,
                             videoFrom: WEBSITE.INSTAGRAM,
                         };
+                        createDownloadButton(
+                            item,
+                            WEBSITE.INSTAGRAM,
+                            videoData
+                        );
+                        return videoData;
                     }
                 });
                 return videoData;
             });
-            const updatedVideoDataArray = videoDataArray.map((x) => ({
-                videoName: x?.[0]?.videoName,
-                videoRef: x?.[0]?.videoRef,
-                isVideoReadyToDownloading: x?.[0]?.isVideoReadyToDownloading,
-                videoFrom: x?.[0]?.videoFrom,
-            }));
-
-            updatePopupData(videoDataArray, updatedVideoDataArray);
         } else if (window.location.host === "www.dailymotion.com") {
+            // logic for Dailymotion
             const videoRefSplitted = window.location?.pathname?.split("/");
             const dailyVideoId =
                 videoRefSplitted?.[videoRefSplitted?.length - 1];
@@ -291,17 +296,21 @@
                                     },
                                 ];
 
-                                updatePopupData(videoDataArray);
+                                createDownloadButton(
+                                    document.getElementById("player-wrapper"),
+                                    WEBSITE.DAILYMOTION,
+                                    getFirstItemOfArray(videoDataArray)
+                                );
                             });
                     });
             }
         } else if (window.location.host === "vimeo.com") {
+            // logic for Vimeo
             const videoName = document.querySelector(
                 "div > h1[class][format] > span"
             )?.innerText;
-            const videoRefSplitted = window.location?.pathname?.split("/");
-            const vimeoVideoId =
-                videoRefSplitted?.[videoRefSplitted?.length - 1];
+            const vimeoVideo = document.getElementsByClassName("player")?.[0];
+            var vimeoVideoId = vimeoVideo?.getAttribute("id");
             const videoDataArray = [
                 {
                     videoName: cutLongName(videoName),
@@ -311,7 +320,11 @@
                 },
             ];
 
-            updatePopupData(videoDataArray);
+            createDownloadButton(
+                vimeoVideo,
+                WEBSITE.VIMEO,
+                getFirstItemOfArray(videoDataArray)
+            );
         }
 
         // Logic to download video from mbasic favebook

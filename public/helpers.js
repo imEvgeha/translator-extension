@@ -1,5 +1,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
+const getFifthParentOfItem = (item) => {
+    return item.parentElement.parentElement.parentElement.parentElement
+        .parentElement.parentElement;
+};
+
+const getTenParentOfItem = (item) => {
+    return getFifthParentOfItem(item).parentElement.parentElement.parentElement
+        .parentElement;
+};
+
 const getThirteenthParentOfItem = (item) => {
     return item.parentElement.parentElement.parentElement.parentElement
         .parentElement.parentElement.parentElement.parentElement.parentElement
@@ -23,11 +33,6 @@ const extractShortRefFromArray = (array) => {
             });
         return arrayWithIds.length ? arrayWithIds[arrayWithIds.length - 1] : [];
     }
-};
-
-const getFifthParentOfItem = (item) => {
-    return item.parentElement.parentElement.parentElement.parentElement
-        .parentElement.parentElement;
 };
 
 const downloadItemByUrl = (url, name, isFacebook) => {
@@ -114,3 +119,50 @@ function isVideoIdInArraysEqual(a1, a2) {
         JSON.stringify(a2.map((item) => item.videoId))
     );
 }
+
+const returnItemParent = (item, website) => {
+    switch (website) {
+        case WEBSITE.FACEBOOK:
+            return getTenParentOfItem(item);
+        case WEBSITE.INSTAGRAM:
+            return getFifthParentOfItem(item);
+        case WEBSITE.TWITTER:
+            return getFifthParentOfItem(item);
+        case WEBSITE.DAILYMOTION:
+            return item;
+        case WEBSITE.VIMEO:
+            return getFifthParentOfItem(item);
+        default:
+            return item;
+    }
+};
+
+const getFirstItemOfArray = (array) => {
+    return array?.length ? array[0] : [];
+};
+
+const getDownloadButton = (data) => {
+    const button = document.createElement("button");
+    button.classList.add("download-button");
+    button.innerHTML = DOWNLOAD_ICON;
+    button.addEventListener("click", () => {
+        chrome?.runtime?.sendMessage({
+            messageType: "DownloadItemFromOtherPlace",
+            data: data,
+        });
+    });
+    return button;
+};
+
+const createDownloadButton = (item, website, videoData) => {
+    const currentItemChildren = returnItemParent(item, website)?.children;
+    const itemWrapperChildren = currentItemChildren
+        ? [...currentItemChildren]?.map((item) => item.localName)
+        : [];
+
+    if (!itemWrapperChildren?.includes("button")) {
+        returnItemParent(item, website)?.appendChild(
+            getDownloadButton(videoData)
+        );
+    }
+};
