@@ -1,87 +1,40 @@
-/* eslint-disable no-undef */
-chrome.runtime.onMessage.addListener((request) => {
-    const handleError = (
-        error = "Something went wrong, please try again later",
-        item
-    ) => {
-        console.error(error, " on ", item);
-    };
-
-    const handleDownloadClick = async (item) => {
-        const [tab] = await chrome.tabs.query({
-            active: true,
-            lastFocusedWindow: true,
+const generateTranslateButtons = (array = []) => {
+    // eslint-disable-next-line no-undef
+    chrome.contextMenus.removeAll();
+    array?.forEach((item) => {
+        // eslint-disable-next-line no-undef
+        chrome.contextMenus.create({
+            id: `${item?.code}`,
+            title: `Translate "%s" to ${item?.language}`,
+            contexts: ["selection"],
         });
-        if (item.videoFrom === "FACEBOOK") {
-            await chrome.tabs.sendMessage(tab.id, {
-                messageType: "DownloadFacebookVideo",
-                data: `https://mbasic.facebook.com/watch/?v=${item.videoRef}`,
-                name: item.videoName,
-                ...item,
-            });
-        }
-        if (item.videoFrom === "TWITTER") {
-            await chrome.tabs.sendMessage(tab.id, {
-                messageType: "DownloadTwitterVideo",
-                data: item.videoRef,
-                name: item.videoName,
-                ...item,
-            });
-        }
-        if (item.videoFrom === "INSTAGRAM") {
-            await chrome.tabs.sendMessage(tab.id, {
-                messageType: "DownloadInstagramVideo",
-                data: item.videoRef,
-                isVideoReadyToDownloading: item.isVideoReadyToDownloading,
-                name: item.videoName,
-                ...item,
-            });
-        }
-        if (item.videoFrom === "DAILYMOTION") {
-            await chrome.tabs.sendMessage(tab.id, {
-                messageType: "DownloadDailymotionVideo",
-                data: item.videoRef,
-                name: item.videoName,
-                ...item,
-            });
-        }
-        if (item.videoFrom === "VIMEO") {
-            fetch(
-                `https://vimeo.com/${item.videoRef}?action=load_download_config`,
-                {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                }
-            )
-                .then((response) => {
-                    return response.json();
-                })
-                .then(async ({ files, display_message }) => {
-                    if (files?.length) {
-                        const higherQualityVideo = files[files.length - 1];
-                        const videoName = higherQualityVideo.base_file_name;
-                        const videoUrl = higherQualityVideo.download_url;
+    });
+};
 
-                        await chrome.tabs.sendMessage(tab.id, {
-                            messageType: "DownloadVimeoVideo",
-                            data: videoUrl,
-                            name: videoName,
-                            ...item,
-                        });
-                    } else {
-                        handleError(display_message, item);
-                    }
-                })
-                .catch((error) => handleError(error, item));
-        }
-    };
+(async () => {
+    // eslint-disable-next-line no-undef
+    await chrome?.storage?.local?.get(["selectedLanguages"])?.then((result) => {
+        const selectedLanguagesFromStorage = result?.selectedLanguages?.list;
+        if (!selectedLanguagesFromStorage) return;
+        generateTranslateButtons(selectedLanguagesFromStorage);
+    });
+})();
 
+/* eslint-disable no-undef */
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch (request.messageType) {
-        case "DownloadItemFromOtherPlace":
-            handleDownloadClick(request.data);
+        case "addVariant":
+            generateTranslateButtons(request?.languages);
             break;
         default:
-            return;
+            console.log("Sorry, background can't handle " + request + ".");
     }
+});
+
+// eslint-disable-next-line no-undef
+chrome.contextMenus.onClicked.addListener(function (clickData) {
+    // eslint-disable-next-line no-undef
+    chrome.tabs.create({
+        url: `https://translate.google.com/?sl=auto&tl=${clickData.menuItemId}&text=${clickData.selectionText}&op=translate`,
+    });
 });
